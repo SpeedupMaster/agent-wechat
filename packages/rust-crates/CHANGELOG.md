@@ -1,5 +1,18 @@
 # @agent-wechat/rust-crates
 
+## 3.2.1
+
+### Patch Changes
+
+- [#732](https://github.com/thisnick/agent-wechat/pull/732) [`45e9ace`](https://github.com/thisnick/agent-wechat/commit/45e9ace80a901c7e3448837c740dd6aa350ee187) Thanks [@thisnick](https://github.com/thisnick)! - Clear saved group member display names and opaque member fields in `chat_room.ext_buffer` when a roster refresh omits them for returned members, matching the official Linux client while preserving unchanged delta members and unknown extension chunks. Also omit field 2 locally when clearing your own group display name via `MyName`, and update `wechat_profile::NativeMemberPatch` fields to `NativeFieldPatch<T>` (`Keep`, `Clear`, `Set`).
+
+- [#726](https://github.com/thisnick/agent-wechat/pull/726) [`324b065`](https://github.com/thisnick/agent-wechat/commit/324b065a2d3652b4435239986b99ea444fa20a43) Thanks [@thisnick](https://github.com/thisnick)! - Stop a group refresh from repeating forever and stop interrupted starts from keeping database copies on a full disk (#722).
+
+  - When a group changed again while its information was being refreshed, the daemon kept fetching that group's details from WeChat on every pass and wrote ever-longer rows into `control.sqlite`. It now fetches once more and stops. Rows earlier versions left behind are removed by the regular cleanup after seven days, and the database shrinks once there is room to compact it.
+  - Copies that an interrupted start left in `.sqlite-admission-*` folders are now removed before the daemon copies a database again, not only after a start succeeds. A start that failed for lack of disk space used to keep them, so it could never free the space it needed. A copy left while the daemon was already opening the database is still kept until a start succeeds. When the disk is full, the error now says how much free space the check needs.
+
+- [#731](https://github.com/thisnick/agent-wechat/pull/731) [`9076c39`](https://github.com/thisnick/agent-wechat/commit/9076c39d0a9f2a7fdcabeb6d0ddbe9edda73cdd2) Thanks [@thisnick](https://github.com/thisnick)! - Retention of the daemon's internal `control.sqlite` notes now comes from one list of every kind of note, and keeps every note for as long as before. The general way the daemon saves such a note now refuses keys over 16 KiB, which only a bug can produce (#722 grew keys to 86 KB).
+
 ## 3.2.0
 
 ### Minor Changes
